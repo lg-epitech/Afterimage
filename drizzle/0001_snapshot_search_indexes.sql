@@ -1,0 +1,2 @@
+CREATE INDEX "journal_entries_snapshot_title_trgm_idx" ON "journal_entries" USING gin (("movie_snapshot"->>'title') gin_trgm_ops);--> statement-breakpoint
+CREATE INDEX "journal_entries_snapshot_original_title_trgm_idx" ON "journal_entries" USING gin (("movie_snapshot"->>'originalTitle') gin_trgm_ops);
