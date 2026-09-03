@@ -6,6 +6,8 @@ export default defineConfig({
   dialect: "postgresql",
   dbCredentials: {
     url:
+      process.env.POSTGRES_URL_NON_POOLING ??
+      process.env.POSTGRES_URL ??
       process.env.DATABASE_URL ??
       "postgresql://afterimage:afterimage@localhost:5432/afterimage",
   },

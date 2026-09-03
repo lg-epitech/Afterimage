@@ -26,7 +26,7 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-Before starting, copy `.env.example` to `.env.local` on a fresh checkout and fill in the Clerk and TMDB values. If Clerk's CLI already generated `.env.local`, keep those keys and add the missing `DATABASE_URL` / `TMDB_API_TOKEN` values instead of overwriting the file.
+Before starting, copy `.env.example` to `.env.local` on a fresh checkout and fill in the Clerk and TMDB values. If Clerk's CLI already generated `.env.local`, keep those keys and add the missing `POSTGRES_URL` / `TMDB_API_TOKEN` values instead of overwriting the file.
 
 The default database URL matches the Compose service:
 
@@ -35,6 +35,8 @@ postgresql://afterimage:afterimage@localhost:5432/afterimage
 ```
 
 `docker compose down` stops PostgreSQL and keeps the named volume intact. The development port binds to `127.0.0.1` only, so the simple local credentials are not exposed to your network.
+
+On Vercel, Afterimage uses the variables installed by the Neon integration: `POSTGRES_URL` for application queries and `POSTGRES_URL_NON_POOLING` for Drizzle migrations. The older `DATABASE_URL` name remains supported as a fallback.
 
 ## Configure Clerk + Google
 
