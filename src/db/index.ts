@@ -5,13 +5,17 @@ import * as schema from "@/db/schema";
 
 function createDatabase() {
   const databaseUrl =
+    process.env.POSTGRES_URL ??
+    process.env.POSTGRES_URL_NON_POOLING ??
     process.env.DATABASE_URL ??
     (process.env.NODE_ENV !== "production"
       ? "postgresql://afterimage:afterimage@localhost:5432/afterimage"
       : undefined);
 
   if (!databaseUrl) {
-    throw new Error("DATABASE_URL is not configured");
+    throw new Error(
+      "POSTGRES_URL, POSTGRES_URL_NON_POOLING, or DATABASE_URL must be configured",
+    );
   }
 
   const client = postgres(databaseUrl, {
