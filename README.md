@@ -36,7 +36,7 @@ postgresql://afterimage:afterimage@localhost:5432/afterimage
 
 `docker compose down` stops PostgreSQL and keeps the named volume intact. The development port binds to `127.0.0.1` only, so the simple local credentials are not exposed to your network.
 
-On Vercel, Afterimage uses the variables installed by the Neon integration: `POSTGRES_URL` for application queries and `POSTGRES_URL_NON_POOLING` for Drizzle migrations. The older `DATABASE_URL` name remains supported as a fallback.
+On Vercel, Afterimage uses the variables installed by the Neon integration: `POSTGRES_URL` for application queries and `POSTGRES_URL_NON_POOLING` for Drizzle migrations. The older `DATABASE_URL` name remains supported as a fallback. The checked-in `vercel.json` applies pending migrations before each Vercel build, so a deployment fails safely instead of serving code against an outdated schema.
 
 ## Configure Clerk + Google
 
