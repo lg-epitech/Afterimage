@@ -20,7 +20,7 @@ function sortJournalEntries(entries: MemoryEntry[]) {
 async function fetchStats() {
   const response = await fetch("/api/stats", { cache: "no-store" });
   const body = (await response.json()) as StatsSummary & { error?: string };
-  if (!response.ok) throw new Error(body.error || "Stats are unavailable.");
+  if (!response.ok) throw new Error(body.error || "Rewind is unavailable.");
   return body;
 }
 
@@ -34,6 +34,7 @@ export function Dashboard() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [statsLoading, setStatsLoading] = useState(true);
   const [statsError, setStatsError] = useState<string | null>(null);
+  const [composing, setComposing] = useState(false);
 
   const loadStats = useCallback(async () => {
     setStatsLoading(true);
@@ -43,7 +44,7 @@ export function Dashboard() {
       setStatsError(null);
     } catch (loadError) {
       setStatsError(
-        loadError instanceof Error ? loadError.message : "Stats are unavailable.",
+        loadError instanceof Error ? loadError.message : "Rewind is unavailable.",
       );
     } finally {
       setStatsLoading(false);
@@ -75,9 +76,7 @@ export function Dashboard() {
       } catch (loadError) {
         if (active) {
           setError(
-            loadError instanceof Error
-              ? loadError.message
-              : "Your journal could not be loaded.",
+            loadError instanceof Error ? loadError.message : "Your journal could not be loaded.",
           );
         }
       } finally {
@@ -95,7 +94,7 @@ export function Dashboard() {
       } catch (loadError) {
         if (active) {
           setStatsError(
-            loadError instanceof Error ? loadError.message : "Stats are unavailable.",
+            loadError instanceof Error ? loadError.message : "Rewind is unavailable.",
           );
         }
       } finally {
@@ -129,7 +128,7 @@ export function Dashboard() {
         error?: string;
       };
       if (!response.ok) {
-        throw new Error(body.error || "More memories could not be loaded.");
+        throw new Error(body.error || "Older entries could not be loaded.");
       }
 
       setEntries((current) => {
@@ -143,9 +142,7 @@ export function Dashboard() {
       setNextOffset(body.nextOffset ?? null);
     } catch (loadError) {
       setError(
-        loadError instanceof Error
-          ? loadError.message
-          : "More memories could not be loaded.",
+        loadError instanceof Error ? loadError.message : "Older entries could not be loaded.",
       );
       throw loadError;
     } finally {
@@ -157,7 +154,7 @@ export function Dashboard() {
     const response = await fetch(`/api/entries/${id}`, { method: "DELETE" });
     if (!response.ok) {
       const body = (await response.json()) as { error?: string };
-      throw new Error(body.error || "That memory could not be removed.");
+      throw new Error(body.error || "That entry could not be removed.");
     }
     const wasInBasePage = entries.some((entry) => entry.id === id);
     setEntries((current) => current.filter((entry) => entry.id !== id));
@@ -171,31 +168,28 @@ export function Dashboard() {
 
   return (
     <div className="dashboard">
-      <QuickAdd onCreated={handleCreated} />
-      <MemoryJournal
-        entries={entries}
-        loading={loading}
-        error={error}
-        total={stats?.total}
-        hasMore={hasMore}
-        loadingMore={loadingMore}
-        onLoadMore={loadMoreEntries}
-        onDelete={handleDelete}
-      />
-      {statsError ? (
-        <div className="dashboard__stats-error" role="alert">
-          <span>{statsError}</span>
-          <button type="button" onClick={() => void loadStats()}>
-            Try rewind again
-          </button>
-        </div>
-      ) : null}
-      {statsLoading && !stats ? (
-        <p className="dashboard__stats-status" role="status">
-          Developing your rewind…
-        </p>
-      ) : null}
-      <Rewind stats={stats} />
+      <QuickAdd onCreated={handleCreated} onActiveChange={setComposing} />
+      <div className="dashboard__sections" hidden={composing}>
+        <MemoryJournal
+          entries={entries}
+          loading={loading}
+          error={error}
+          total={stats?.total}
+          hasMore={hasMore}
+          loadingMore={loadingMore}
+          onLoadMore={loadMoreEntries}
+          onDelete={handleDelete}
+        />
+        {statsError ? (
+          <div className="notice notice--error notice--row" role="alert">
+            <span>{statsError}</span>
+            <button type="button" className="link-button" onClick={() => void loadStats()}>
+              Try again
+            </button>
+          </div>
+        ) : null}
+        <Rewind stats={stats} loading={statsLoading} />
+      </div>
     </div>
   );
 }

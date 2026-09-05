@@ -96,6 +96,20 @@ function normalizeImagePath(value: unknown): string | null {
   return value;
 }
 
+function normalizeVoteAverage(
+  average: unknown,
+  count: unknown,
+): number | null {
+  const votes = nonNegativeInteger(count) ?? 0;
+  const value = finiteNumber(average);
+
+  if (votes === 0 || value === null || value <= 0 || value > 10) {
+    return null;
+  }
+
+  return Math.round(value * 10) / 10;
+}
+
 function uniqueStrings(values: Array<string | null>): string[] {
   const seen = new Set<string>();
   const result: string[] = [];
@@ -150,6 +164,8 @@ export function normalizeMovieSearchResult(
         })
       : [],
     popularity: finiteNumber(value.popularity) ?? 0,
+    voteAverage: normalizeVoteAverage(value.vote_average, value.vote_count),
+    voteCount: nonNegativeInteger(value.vote_count) ?? 0,
   };
 }
 

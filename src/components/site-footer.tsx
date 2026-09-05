@@ -5,28 +5,20 @@ const tmdbLogo =
 
 export function SiteFooter() {
   return (
-    <footer className="site-footer">
-      <p className="site-footer__quote">
-        “To live in hearts we leave behind is not to die.”
-      </p>
-      <div className="tmdb-credit">
+    <footer className="foot">
+      <span className="foot__name">Afterimage</span>
+      <div className="foot__credit">
         <a
           href="https://www.themoviedb.org"
           target="_blank"
           rel="noreferrer"
-          aria-label="Visit The Movie Database"
+          aria-label="The Movie Database"
         >
-          <Image
-            src={tmdbLogo}
-            alt="TMDB"
-            width={100}
-            height={13}
-            unoptimized
-          />
+          <Image src={tmdbLogo} alt="TMDB" width={84} height={11} unoptimized />
         </a>
         <p>
-          This product uses the TMDB API but is not endorsed or certified by
-          TMDB.
+          Film details and images come from TMDB. This product uses the TMDB
+          API but is not endorsed or certified by TMDB.
         </p>
       </div>
     </footer>

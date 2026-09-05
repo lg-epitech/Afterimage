@@ -6,9 +6,9 @@ import { SiteHeader } from "@/components/site-header";
 
 export default function Home() {
   return (
-    <div className="site-shell" id="top">
+    <div className="shell" id="top">
       <SiteHeader />
-      <main className="site-main">
+      <main className="shell__main">
         <Show when="signed-in" fallback={<SignedOutLanding />}>
           <Dashboard />
         </Show>

@@ -24,6 +24,8 @@ describe("TMDB normalization", () => {
             original_language: "en",
             genre_ids: [18, "bad-value"],
             popularity: 45.2,
+            vote_average: 8.438,
+            vote_count: 29000,
             adult: false,
           },
           { id: 2, title: "Excluded", adult: true },
@@ -46,6 +48,8 @@ describe("TMDB normalization", () => {
           originalLanguage: "en",
           genreIds: [18],
           popularity: 45.2,
+          voteAverage: 8.4,
+          voteCount: 29000,
         },
       ],
     });

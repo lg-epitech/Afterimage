@@ -1,35 +1,33 @@
 import { Show, SignInButton, UserButton } from "@clerk/nextjs";
-import { LogIn } from "lucide-react";
 import { BrandMark } from "@/components/brand-mark";
 
 export function SiteHeader() {
   return (
-    <header className="site-header">
-      <a className="brand" href="#top" aria-label="Afterimage home">
+    <header className="topbar">
+      <a className="wordmark" href="#top" aria-label="Afterimage home">
         <BrandMark />
-        <span className="brand__word">Afterimage</span>
+        <span>Afterimage</span>
       </a>
 
       <Show
         when="signed-in"
         fallback={
           <SignInButton mode="modal" forceRedirectUrl="/">
-            <button className="button button--quiet" type="button">
-              <LogIn size={16} strokeWidth={1.8} />
+            <button className="btn btn--ghost" type="button">
               Sign in
             </button>
           </SignInButton>
         }
       >
-        <div className="header-actions">
-          <nav className="desktop-nav" aria-label="Primary navigation">
+        <div className="topbar__end">
+          <nav className="topbar__nav" aria-label="Sections">
             <a href="#journal">Journal</a>
             <a href="#rewind">Rewind</a>
           </nav>
           <UserButton
             appearance={{
               elements: {
-                avatarBox: "afterimage-avatar",
+                avatarBox: "topbar__avatar",
               },
             }}
           />

@@ -1,8 +1,13 @@
 import Image from "next/image";
-import { Film } from "lucide-react";
 import { clsx } from "clsx";
 
-export function posterUrl(path: string | null, size: "w185" | "w342" = "w342") {
+export type PosterSize = "w185" | "w342" | "w500";
+
+export function posterUrl(path: string | null, size: PosterSize = "w342") {
+  return path ? `https://image.tmdb.org/t/p/${size}${path}` : null;
+}
+
+export function backdropUrl(path: string | null, size: "w780" | "w1280" = "w780") {
   return path ? `https://image.tmdb.org/t/p/${size}${path}` : null;
 }
 
@@ -11,18 +16,20 @@ export function MoviePoster({
   title,
   className,
   sizes = "(max-width: 640px) 72px, 160px",
+  size = "w342",
   preload = false,
 }: {
   path: string | null;
   title: string;
   className?: string;
   sizes?: string;
+  size?: PosterSize;
   preload?: boolean;
 }) {
-  const src = posterUrl(path);
+  const src = posterUrl(path, size);
 
   return (
-    <div className={clsx("movie-poster", className)}>
+    <div className={clsx("poster", className)}>
       {src ? (
         <Image
           src={src}
@@ -32,8 +39,7 @@ export function MoviePoster({
           preload={preload}
         />
       ) : (
-        <div className="movie-poster__fallback" aria-label={`No poster for ${title}`}>
-          <Film size={25} strokeWidth={1.4} />
+        <div className="poster__empty" aria-label={`No poster for ${title}`}>
           <span>{title.slice(0, 1)}</span>
         </div>
       )}

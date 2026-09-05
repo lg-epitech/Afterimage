@@ -9,6 +9,8 @@ export type MovieSearchResult = {
   originalLanguage: string;
   genreIds: number[];
   popularity: number;
+  voteAverage: number | null;
+  voteCount: number;
 };
 
 export type MovieSearchResponse = {
@@ -54,4 +56,41 @@ export function getTmdbImageUrl(
   }
 
   return `https://image.tmdb.org/t/p/${size}${path}`;
+}
+
+/** TMDB's fixed list of movie genre IDs. Search results only carry the IDs. */
+const MOVIE_GENRES: Record<number, string> = {
+  28: "Action",
+  12: "Adventure",
+  16: "Animation",
+  35: "Comedy",
+  80: "Crime",
+  99: "Documentary",
+  18: "Drama",
+  10751: "Family",
+  14: "Fantasy",
+  36: "History",
+  27: "Horror",
+  10402: "Music",
+  9648: "Mystery",
+  10749: "Romance",
+  878: "Science fiction",
+  10770: "TV movie",
+  53: "Thriller",
+  10752: "War",
+  37: "Western",
+};
+
+export function genreNames(genreIds: number[], limit = 3): string[] {
+  const names: string[] = [];
+  for (const id of genreIds) {
+    const name = MOVIE_GENRES[id];
+    if (name && !names.includes(name)) names.push(name);
+    if (names.length >= limit) break;
+  }
+  return names;
+}
+
+export function tmdbMovieUrl(tmdbId: number) {
+  return `https://www.themoviedb.org/movie/${tmdbId}`;
 }
