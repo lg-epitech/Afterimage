@@ -1,11 +1,10 @@
 "use client";
 
-import { Clock3, Film, Heart, RotateCcw, Sparkles } from "lucide-react";
 import { useMemo } from "react";
 import type { StatsSummary } from "@/lib/types";
 
-const monthNames = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
-const monthLabels = [
+const monthInitials = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
+const monthNames = [
   "January",
   "February",
   "March",
@@ -20,10 +19,18 @@ const monthLabels = [
   "December",
 ];
 
+function hoursLabel(totalMinutes: number) {
+  const hours = totalMinutes / 60;
+  if (hours >= 100) return String(Math.round(hours));
+  return String(Math.round(hours * 10) / 10);
+}
+
 export function Rewind({
   stats,
+  loading = false,
 }: {
   stats: StatsSummary | null;
+  loading?: boolean;
 }) {
   const year = stats?.year ?? new Date().getFullYear();
   const monthCounts = useMemo(() => {
@@ -37,104 +44,109 @@ export function Rewind({
     return counts;
   }, [stats, year]);
   const maxCount = Math.max(...monthCounts, 1);
-  const lovedPercent = stats?.total ? Math.round((stats.loved / stats.total) * 100) : 0;
-  const hours = stats ? Math.round((stats.totalMinutes / 60) * 10) / 10 : 0;
+  const total = stats?.total ?? 0;
   const onThisDay = stats?.onThisDay ?? [];
+  const busiest = monthCounts.indexOf(maxCount);
 
   return (
-    <section className="rewind" id="rewind" aria-labelledby="rewind-title">
-      <div className="section-heading rewind__heading">
-        <div>
-          <span className="section-kicker">Rewind</span>
-          <h2 id="rewind-title">The shape of your watching</h2>
+    <section
+      className="rewind"
+      id="rewind"
+      aria-labelledby="rewind-title"
+      aria-busy={loading && !stats}
+    >
+      <div className="section-head">
+        <h2 id="rewind-title">Rewind</h2>
+        <span className="section-head__year" aria-label={`Year ${year}`}>
+          {year}
+        </span>
+      </div>
+
+      <dl className="figures">
+        <div className="figures__item">
+          <dd>{total}</dd>
+          <dt>{total === 1 ? "film" : "films"}</dt>
         </div>
-        <span className="rewind__year">{year}</span>
-      </div>
+        <div className="figures__item">
+          <dd>{hoursLabel(stats?.totalMinutes ?? 0)}</dd>
+          <dt>hours watching</dt>
+        </div>
+        <div className="figures__item">
+          <dd>{stats?.loved ?? 0}</dd>
+          <dt>loved</dt>
+        </div>
+        <div className="figures__item">
+          <dd>{stats?.rewatches ?? 0}</dd>
+          <dt>{stats?.rewatches === 1 ? "rewatch" : "rewatches"}</dt>
+        </div>
+      </dl>
 
-      <div className="stat-grid">
-        <article className="stat-card stat-card--feature">
-          <span className="stat-card__icon">
-            <Film size={19} />
-          </span>
-          <strong>{stats?.total ?? 0}</strong>
-          <span>films remembered</span>
-          <small>{stats?.topGenre ? `${stats.topGenre} found you most often` : "Your story is just beginning"}</small>
-        </article>
-        <article className="stat-card">
-          <span className="stat-card__icon">
-            <Clock3 size={18} />
-          </span>
-          <strong>{hours}</strong>
-          <span>hours in other worlds</span>
-        </article>
-        <article className="stat-card">
-          <span className="stat-card__icon stat-card__icon--heart">
-            <Heart size={18} />
-          </span>
-          <strong>{stats?.loved ?? 0}</strong>
-          <span>films you loved</span>
-          <small>{lovedPercent}% of your journal</small>
-        </article>
-        <article className="stat-card">
-          <span className="stat-card__icon">
-            <RotateCcw size={18} />
-          </span>
-          <strong>{stats?.rewatches ?? 0}</strong>
-          <span>return visits</span>
-        </article>
-      </div>
+      <p className="rewind__line">
+        {loading && !stats
+          ? "Adding things up."
+          : total === 0
+            ? "Nothing here yet. Your first entry starts the count."
+            : stats?.topGenre
+              ? `${stats.topGenre} came up most often${
+                  monthCounts[busiest] > 0 ? `, and ${monthNames[busiest]} was your busiest month` : ""
+                }.`
+              : monthCounts[busiest] > 0
+                ? `${monthNames[busiest]} was your busiest month.`
+                : " "}
+      </p>
 
-      <div className="rewind-panels">
-        <article className="activity-panel">
-          <div className="activity-panel__heading">
-            <div>
-              <h3>{year}, frame by frame</h3>
-              <p>Each bar is a month in your film year.</p>
-            </div>
-            <Sparkles size={18} />
-          </div>
+      <div className="rewind__grid">
+        <div className="panel chart">
+          <h3 className="panel__title">Films by month</h3>
           <div
-            className="month-chart"
+            className="bars"
+            role="img"
             aria-label={`Films watched by month in ${year}: ${monthCounts
-              .map((count, index) => `${monthLabels[index]} ${count}`)
+              .map((count, index) => `${monthNames[index]} ${count}`)
               .join(", ")}`}
           >
             {monthCounts.map((count, index) => (
-              <div className="month-chart__column" key={`${monthNames[index]}-${index}`}>
-                <span className="month-chart__count">{count || ""}</span>
-                <span className="month-chart__track">
+              <div
+                className="bars__col"
+                key={monthNames[index]}
+                tabIndex={0}
+                aria-label={`${monthNames[index]}: ${count} ${count === 1 ? "film" : "films"}`}
+              >
+                <span className="bars__tip" aria-hidden="true">
+                  {count}
+                </span>
+                <span className="bars__track">
                   <span
-                    className="month-chart__bar"
-                    style={{ height: count ? `${Math.max((count / maxCount) * 100, 12)}%` : "3px" }}
+                    className="bars__bar"
+                    style={{ height: count ? `${Math.max((count / maxCount) * 100, 6)}%` : "0" }}
                   />
                 </span>
-                <span className="month-chart__label">{monthNames[index]}</span>
+                <span className="bars__label" aria-hidden="true">
+                  {monthInitials[index]}
+                </span>
               </div>
             ))}
           </div>
-        </article>
+        </div>
 
-        <article className="on-this-day">
-          <span className="on-this-day__eyebrow">On this day</span>
+        <div className="panel today">
+          <h3 className="panel__title">On this day</h3>
           {onThisDay.length ? (
-            <>
-              <h3>A few old frames are flickering.</h3>
-              <ul>
-                {onThisDay.map((entry) => (
-                  <li key={entry.id}>
-                    <strong>{entry.title}</strong>
-                    <span>{entry.watchedOn.slice(0, 4)}</span>
-                  </li>
-                ))}
-              </ul>
-            </>
+            <ul className="today__list">
+              {onThisDay.map((entry) => (
+                <li key={entry.id}>
+                  <span>{entry.title}</span>
+                  <span className="today__year">{entry.watchedOn.slice(0, 4)}</span>
+                </li>
+              ))}
+            </ul>
           ) : (
-            <>
-              <h3>Nothing from today — yet.</h3>
-              <p>As your journal grows, films from this date will return here.</p>
-            </>
+            <p className="panel__text">
+              Nothing yet. Films you watched on this date in earlier years will
+              show up here.
+            </p>
           )}
-        </article>
+        </div>
       </div>
     </section>
   );
