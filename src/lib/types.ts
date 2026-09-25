@@ -72,19 +72,8 @@ export interface CreateEntryResponse {
 }
 
 export interface StatsSummary {
-  year: number;
   total: number;
   loved: number;
   rewatches: number;
   totalMinutes: number;
-  topGenre: string | null;
-  monthly: Array<{
-    month: string;
-    count: number;
-  }>;
-  onThisDay: Array<{
-    id: string;
-    title: string;
-    watchedOn: string;
-  }>;
 }

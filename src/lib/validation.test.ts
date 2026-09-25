@@ -33,7 +33,7 @@ describe("entry validation", () => {
     expect(parsed.tags).toEqual(["Dreamlike"]);
   });
 
-  it("rejects invalid timezone context instead of corrupting rewind dates", () => {
+  it("rejects invalid timezone context instead of corrupting watch dates", () => {
     const parsed = createEntrySchema.safeParse({
       ...validEntry,
       watchedTimezone: "not/a-zone",
