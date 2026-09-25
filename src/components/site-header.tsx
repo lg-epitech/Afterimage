@@ -22,7 +22,7 @@ export function SiteHeader() {
         <div className="topbar__end">
           <nav className="topbar__nav" aria-label="Sections">
             <a href="#journal">Journal</a>
-            <a href="#rewind">Rewind</a>
+            <a href="#stats">Stats</a>
           </nav>
           <UserButton
             appearance={{

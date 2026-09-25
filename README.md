@@ -2,7 +2,7 @@
 
 Afterimage is a private movie journal for the films—and the moments around them—that stay with you.
 
-Search TMDB, record a simple **Didn't like / Liked / Loved** reaction, leave a note, and optionally remember the people, place, platform, mood, tags, and whether it was a rewatch. The stored timestamps and movie snapshots power searchable memories and rewinds without rewriting the past when provider metadata changes.
+Search TMDB, record a simple **Didn't like / Liked / Loved** reaction, leave a note, and optionally remember the people, place, platform, mood, tags, and whether it was a rewatch. The stored timestamps and movie snapshots power searchable memories and stats without rewriting the past when provider metadata changes.
 
 ## Stack
 
@@ -70,7 +70,7 @@ Each viewing is its own `journal_entries` row—even when the same film is watch
 - setting, location, venue, platform, companions, mood, tags, and rewatch status
 - an immutable movie snapshot captured when the memory is logged
 
-Movies are normalized separately with TMDB and IMDb IDs, release date, runtime, genres, directors, cast, countries, poster/backdrop paths, and provider fetch time. Journal search covers titles, notes, genres, people, places, moods, and tags, with trigram indexes on the most common text fields; dates, reactions, runtime, genres, and rewatch flags support rewinds.
+Movies are normalized separately with TMDB and IMDb IDs, release date, runtime, genres, directors, cast, countries, poster/backdrop paths, and provider fetch time. Journal search covers titles, notes, genres, people, places, moods, and tags, with trigram indexes on the most common text fields; dates, reactions, runtime, genres, and rewatch flags support stats and a future yearly rewind.
 
 ## Commands
 

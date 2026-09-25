@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { EntriesResponse, MemoryEntry, StatsSummary } from "@/lib/types";
 import { MemoryJournal } from "@/components/memory-journal";
 import { QuickAdd } from "@/components/quick-add";
-import { Rewind } from "@/components/rewind";
+import { StatsRecap } from "@/components/stats-recap";
 
 const JOURNAL_PAGE_SIZE = 24;
 
@@ -20,7 +20,7 @@ function sortJournalEntries(entries: MemoryEntry[]) {
 async function fetchStats() {
   const response = await fetch("/api/stats", { cache: "no-store" });
   const body = (await response.json()) as StatsSummary & { error?: string };
-  if (!response.ok) throw new Error(body.error || "Rewind is unavailable.");
+  if (!response.ok) throw new Error(body.error || "Stats are unavailable.");
   return body;
 }
 
@@ -44,7 +44,7 @@ export function Dashboard() {
       setStatsError(null);
     } catch (loadError) {
       setStatsError(
-        loadError instanceof Error ? loadError.message : "Rewind is unavailable.",
+        loadError instanceof Error ? loadError.message : "Stats are unavailable.",
       );
     } finally {
       setStatsLoading(false);
@@ -94,7 +94,7 @@ export function Dashboard() {
       } catch (loadError) {
         if (active) {
           setStatsError(
-            loadError instanceof Error ? loadError.message : "Rewind is unavailable.",
+            loadError instanceof Error ? loadError.message : "Stats are unavailable.",
           );
         }
       } finally {
@@ -188,7 +188,7 @@ export function Dashboard() {
             </button>
           </div>
         ) : null}
-        <Rewind stats={stats} loading={statsLoading} />
+        <StatsRecap stats={stats} loading={statsLoading} />
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, lt, or, sql, type SQL } from "drizzle-orm";
+import { and, desc, eq, or, sql, type SQL } from "drizzle-orm";
 
 import { getDb } from "@/db";
 import {
@@ -253,27 +253,6 @@ export async function listMemoryEntries(
 
 export async function getMemoryStats(userId: string): Promise<StatsSummary> {
   const db = getDb();
-  const [profile] = await db
-    .select({ timezone: profiles.timezone })
-    .from(profiles)
-    .where(eq(profiles.clerkUserId, userId))
-    .limit(1);
-  const dateParts = Object.fromEntries(
-    new Intl.DateTimeFormat("en", {
-      timeZone: profile?.timezone ?? "UTC",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    })
-      .formatToParts(new Date())
-      .map((part) => [part.type, part.value]),
-  );
-  const year = Number(dateParts.year);
-  const yearStart = `${year}-01-01`;
-  const nextYearStart = `${year + 1}-01-01`;
-  const month = Number(dateParts.month);
-  const day = Number(dateParts.day);
-
   const [totals] = await db
     .select({
       total: sql<number>`count(*)::int`,
@@ -287,59 +266,11 @@ export async function getMemoryStats(userId: string): Promise<StatsSummary> {
     .innerJoin(movies, eq(journalEntries.movieId, movies.id))
     .where(eq(journalEntries.userId, userId));
 
-  const topGenres = await db.execute<{ genre: string }>(sql`
-    select genre.value as genre
-    from ${journalEntries} as entry
-    cross join lateral jsonb_array_elements_text(entry.movie_snapshot->'genres') as genre(value)
-    where entry.user_id = ${userId}
-    group by genre.value
-    order by count(*) desc, genre.value asc
-    limit 1
-  `);
-
-  const monthly = await db
-    .select({
-      month: sql<string>`to_char(${journalEntries.watchedOn}, 'YYYY-MM')`,
-      count: sql<number>`count(*)::int`,
-    })
-    .from(journalEntries)
-    .where(
-      and(
-        eq(journalEntries.userId, userId),
-        gte(journalEntries.watchedOn, yearStart),
-        lt(journalEntries.watchedOn, nextYearStart),
-      ),
-    )
-    .groupBy(sql`to_char(${journalEntries.watchedOn}, 'YYYY-MM')`)
-    .orderBy(sql`to_char(${journalEntries.watchedOn}, 'YYYY-MM')`);
-
-  const onThisDayRows = await db
-    .select({
-      id: journalEntries.id,
-      watchedOn: journalEntries.watchedOn,
-      title: sql<string>`${journalEntries.movieSnapshot}->>'title'`,
-    })
-    .from(journalEntries)
-    .where(
-      and(
-        eq(journalEntries.userId, userId),
-        lt(journalEntries.watchedOn, yearStart),
-        sql`extract(month from ${journalEntries.watchedOn}) = ${month}`,
-        sql`extract(day from ${journalEntries.watchedOn}) = ${day}`,
-      ),
-    )
-    .orderBy(desc(journalEntries.watchedOn), desc(journalEntries.createdAt))
-    .limit(3);
-
   return {
-    year,
     total: totals?.total ?? 0,
     loved: totals?.loved ?? 0,
     rewatches: totals?.rewatches ?? 0,
     totalMinutes: totals?.totalMinutes ?? 0,
-    topGenre: topGenres[0]?.genre ?? null,
-    monthly,
-    onThisDay: onThisDayRows,
   };
 }
 
