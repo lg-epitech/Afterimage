@@ -1,3 +1,5 @@
+<img src="src/app/icon.svg" width="72" height="72" alt="Afterimage logo">
+
 # Afterimage
 
 Afterimage is a private movie journal for the films—and the moments around them—that stay with you.
