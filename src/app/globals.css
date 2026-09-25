@@ -145,31 +145,10 @@ a {
 }
 
 .mark {
-  position: relative;
-  display: inline-block;
+  display: block;
+  flex: none;
   width: 22px;
   height: 22px;
-}
-
-.mark__light,
-.mark__ghost {
-  position: absolute;
-  width: 15px;
-  height: 15px;
-  border-radius: 50%;
-}
-
-.mark__light {
-  top: 0;
-  left: 0;
-  background: var(--text);
-}
-
-.mark__ghost {
-  right: 0;
-  bottom: 0;
-  background: var(--accent);
-  opacity: 0.9;
 }
 
 .topbar__end {
